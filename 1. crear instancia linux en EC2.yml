@@ -1,0 +1,105 @@
+Parameters:
+  NombreServidor:  #Nombre del servidor
+    Description: "Ingrese el Nombre del Servidor"
+    Type: String
+  KeyName:         #Nombre llave privada
+    Description: Seleccione una llave privada existente
+    Type: AWS::EC2::KeyPair::KeyName  
+  
+  TipoDeInstancia: #tipo de instancia 
+    Description: Ingrese el tipo de instancia
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t1.micro
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - m1.small
+      - m1.medium
+      - m1.large
+      - m1.xlarge
+      - m2.xlarge
+      - m2.2xlarge
+      - m2.4xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - c1.medium
+      - c1.xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+    ConstraintDescription: must be a valid EC2 instance type.
+Resources:
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref TipoDeInstancia
+      ImageId: ami-0c02fb55956c7d316 # Amazon Linux AMI in N.Virginia
+      Tags:
+        - Key: Name
+          Value: !Ref NombreServidor #Nombre del servidor
+        - Key: backup
+          Value: "yes"
+      KeyName: !Ref KeyName  #Nombred e la llave privada  
+      SecurityGroups:
+        - !Ref administracion #llamado a grupo de seguridad
+        - !Ref httphttps 
+       
+        
+  # Grupo de Seguridad para Administracion     
+  administracion:
+   Type: 'AWS::EC2::SecurityGroup'
+   Properties:
+      GroupDescription: Administracion
+      SecurityGroupIngress:
+       - IpProtocol: tcp
+         FromPort: '22'
+         ToPort: '22'
+         CidrIp: '0.0.0.0/0'
+       
+  #Grupo de seguridad http-https
+  httphttps:
+   Type: 'AWS::EC2::SecurityGroup'
+   Properties:
+      GroupDescription: http-https
+      SecurityGroupIngress:
+       - IpProtocol: tcp
+         FromPort: '80'
+         ToPort: '80'
+         CidrIp: '0.0.0.0/0' 
+       - IpProtocol: tcp
+         FromPort: '443'
+         ToPort: '443'
+         CidrIp: '0.0.0.0/0'   
+  # asosciar ip elastica                       
+  IPAddress:
+    Type: 'AWS::EC2::EIP'
+  IPAssoc:
+    Type: 'AWS::EC2::EIPAssociation'
+    Properties:
+      InstanceId: !Ref Ec2Instance
+      EIP: !Ref IPAddress
