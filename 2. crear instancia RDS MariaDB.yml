@@ -1,0 +1,38 @@
+
+Parameters:
+  usuariodb:  #usuario db
+    Description: "Ingrese el usuario de la base de datoss"
+    Type: String
+    MinLength: 2
+    MaxLength: 41
+    AllowedPattern: ^[a-zA-Z0-9]*$
+    
+    
+  passworddb:  #password db
+    Description: "Ingrese el password para la base de datoss"
+    Type: String
+    NoEcho: true
+    MinLength: 5
+    MaxLength: 41
+    ConstraintDescription: "Por favor ingresar el password de la bd"
+  NombreBD:  #password db
+    Description: "Ingrese el password para la base de datoss"
+    Type: String
+    MinLength: 2
+    MaxLength: 41
+    AllowedPattern: ^[a-zA-Z0-9]*$
+    
+Description: 'Template para desplegar instancia RDS Mariadb'
+
+Resources:
+  DB:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      DBInstanceClass: db.t2.micro
+      AllocatedStorage: 5
+      StorageType: gp2
+      DBName: !Ref NombreBD
+      Engine: MariaDB
+      MasterUsername: !Ref usuariodb
+      MasterUserPassword: !Ref passworddb
+      
